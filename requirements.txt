@@ -1,0 +1,11 @@
+django
+#gunicorn
+#requests
+mysql-python
+djangorestframework
+#django-rest-swagger
+#django-filter
+# dev requirements
+#sphinx_rtd_theme
+#mock
+#responses
