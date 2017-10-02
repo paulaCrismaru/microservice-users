@@ -1,4 +1,4 @@
 *.venv
-mysql.cnf
+*.cnf
 *migrations*
 *.pyc

@@ -9,3 +9,4 @@ djangorestframework
 #sphinx_rtd_theme
 #mock
 #responses
+psycopg2

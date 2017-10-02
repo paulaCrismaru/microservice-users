@@ -1,15 +1,20 @@
-from rest_framework import routers
 from django.conf.urls import include, url
 
 import views
 
 app_name = 'api'
 
-# router = routers.DefaultRouter()
-# router.register(r'users', UserViewSet)
-urlpatterns = [
-    # url(r'^', include(router.urls)),
+user_urls = [
     url(r'users/$',  views.users_list),
-    url(r'users/create/$', views.create_user)
-# url(r'^snippets/$', views.snippet_list),
+    url(r'users/create/$', views.create_user),
 ]
+
+friends_urls = [
+    url(r'friends/sent_requests/$', views.sent_requests),
+    url(r'friends/friend_requests/$', views.received_requests),
+    url(r'friends/$', views.get_friends),
+]
+
+urlpatterns = []
+urlpatterns.extend(user_urls)
+urlpatterns.extend(friends_urls)

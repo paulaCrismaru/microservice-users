@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'wv#6nfm_23p1y11oz*#f1%ph%de)#shx3zx(q2+to873bd*!vl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = True
 
@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'api'
+    'api.apps.ApiConfig'
 )
 
 
@@ -65,21 +65,18 @@ WSGI_APPLICATION = 'micro_user.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': os.path.sep.join([BASE_DIR, 'mysql.cnf']),
-        },
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '<NAME>',
+        'USER': '<USER>',
+        'PASSWORD': '<PASSWORD>',
+        'HOST': '<IP>',
+        'PORT': '<PORT>'
     }
 }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
