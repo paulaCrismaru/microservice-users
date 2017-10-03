@@ -10,8 +10,8 @@ user_urls = [
 ]
 
 friends_urls = [
-    url(r'friends/sent_requests/$', views.sent_requests),
-    url(r'friends/friend_requests/$', views.received_requests),
+    url(r'friends/sent_requests/?(?P<uuid>[0-9a-f\-]*)/$', views.sent_requests),
+    url(r'friends/friend_requests/?(?P<uuid>[0-9a-f\-]*)/$', views.received_requests),
     url(r'friends/$', views.get_friends),
 ]
 

@@ -25,7 +25,7 @@ class FriendshipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Friendships
-        fields = ('sender', 'receiver', 'acceptance')
+        fields = ('sender', 'receiver', 'acceptance', 'uuid')
 
 
 class FriendSerializer(serializers.ModelSerializer):
