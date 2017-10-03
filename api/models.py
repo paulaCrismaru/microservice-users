@@ -15,8 +15,12 @@ class Friendships(models.Model):
     acceptance = models.BooleanField(default=False)
 
     def __getitem__(self, item):
-        if item == 'sender':
-            return self.sender
-        elif item == 'receiver':
-            return self.receiver
-        raise NotImplementedError()
+        items = {
+            'sender': self.sender,
+            'receiver': self.receiver,
+            'acceptance': self.acceptance,
+        }
+        try:
+            return items[item]
+        except KeyError:
+            raise NotImplementedError()
