@@ -5,8 +5,9 @@ import views
 app_name = 'api'
 
 user_urls = [
-    url(r'users/$',  views.users_list),
+    url(r'users/all/$', views.users_list),
     url(r'users/create/$', views.create_user),
+    url(r'users/?(?P<uuid>[0-9a-zA-Z]*)/$',  views.user_profile),
 ]
 
 friends_urls = [

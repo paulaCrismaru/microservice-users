@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from serializers import *
 from models import Friendships
+import utils
 
 
 @api_view(['GET'])
@@ -33,6 +34,7 @@ def create_user(request):
     return Response(serializer.errors, status=400)
 
 
+@csrf_exempt
 @api_view(['GET', 'DELETE'])
 def sent_requests(request, uuid=None):
     user = request.user
@@ -43,6 +45,7 @@ def sent_requests(request, uuid=None):
         return Response(status=status)
 
 
+@csrf_exempt
 @api_view(['GET', 'DELETE', 'POST'])
 def received_requests(request, uuid=None):
     user = request.user
@@ -121,14 +124,30 @@ def delete_friendship(uuid):
     return 200
 
 
+@csrf_exempt
 @api_view(['GET'])
 def get_friends(request):
     user = request.user
     friends_list = [{'username': f.receiver.username} for f in
-                     Friendships.objects.filter(Q(sender__exact=user)&
-                                                Q(acceptance__exact=True))]
+                    Friendships.objects.filter(Q(sender__exact=user)&
+                                               Q(acceptance__exact=True))]
     friends_list.extend([{'username': f.sender.username} for f in
                         Friendships.objects.filter(Q(receiver__exact=user)&
                                                    Q(acceptance__exact=True))])
     serializer = FriendSerializer(friends_list, many=True, context=request)
     return Response(serializer.data, status=200)
+
+
+@csrf_exempt
+@api_view(['GET'])
+def user_profile(request, uuid=None):
+    if uuid is None:
+        # return current user profile
+        pass
+    else:
+        uuid = utils.decode(uuid)
+        try:
+            serializer = UserSerializer(User.objects.get(pk=uuid))
+        except ObjectDoesNotExist:
+            return Response(status=404)
+        return Response(serializer.data, status=200)
