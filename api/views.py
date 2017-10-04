@@ -141,13 +141,14 @@ def get_friends(request):
 @csrf_exempt
 @api_view(['GET'])
 def user_profile(request, uuid=None):
-    if uuid is None:
-        # return current user profile
-        pass
+    if not uuid:
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=200)
     else:
-        uuid = utils.decode(uuid)
         try:
+            uuid = utils.decode(uuid)
             serializer = UserSerializer(User.objects.get(pk=uuid))
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValueError):
             return Response(status=404)
         return Response(serializer.data, status=200)

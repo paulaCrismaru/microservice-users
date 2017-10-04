@@ -1,13 +1,21 @@
-from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 from models import Friendships
+
+import utils
 
 
 class UserSerializer(serializers.ModelSerializer):
+    user_id = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('username', 'email','user_id')
+
+    def get_user_id(self, obj):
+        return utils.encode(obj.id)
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -40,10 +48,3 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username',)
-
-
-class UserDetailsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('username', '')

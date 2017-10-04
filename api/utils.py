@@ -7,7 +7,6 @@ def encode(text):
         text = str(text)
     while len(text) < max_len:
         text = '0' + text
-    print(text)
     return base64.b64encode(text)
 
 
