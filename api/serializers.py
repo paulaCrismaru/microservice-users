@@ -14,7 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email','user_id')
 
-    def get_user_id(self, obj):
+    @staticmethod
+    def get_user_id(obj):
         return utils.encode(obj.id)
 
 

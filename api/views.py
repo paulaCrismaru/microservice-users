@@ -5,6 +5,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound, MethodNotAllowed, ParseError, APIException
 
 from serializers import *
 from models import Friendships
@@ -61,6 +62,8 @@ def received_requests(request, uuid=None):
                 status = accept_friend(user, uuid)
             elif data.get('action') in ['ignore', 'delete']:
                 status = delete_friendship(uuid)
+    if status == 404:
+        raise NotFound()
     return Response(status=status)
 
 
@@ -78,7 +81,7 @@ def action_user_interaction(friend_type, **kwargs):
             user_list = Friendships.objects.filter(**kwargs)
             username_list = {'username': user_list[0][friend_type]}
         except (IndexError, ValidationError):
-            return Response(status=404)
+            raise NotFound()
         serializer = FriendSerializer(username_list)
     return Response(serializer.data, status=200)
 
@@ -86,13 +89,13 @@ def action_user_interaction(friend_type, **kwargs):
 def accept_friend(user, uuid):
     try:
         friendship = Friendships.objects.get(uuid=uuid, receiver=user)
-        if friendship.acceptance is True:
-            return 403
-        friendship.acceptance = True
-        friendship.save()
+        serializer = FriendshipSerializer(friendship)
+        if serializer.data.get('acceptance') is True:
+            return ParseError(detail="Already friends")
+        serializer.update(friendship, {'acceptance': True})
     except ObjectDoesNotExist:
-        return 404
-    return 200
+        raise NotFound()
+    return FriendshipSerializer(serializer.data)
 
 
 def get_received_requests(user, uuid=None):
@@ -120,7 +123,7 @@ def delete_friendship(uuid):
         try:
             Friendships.objects.get(uuid=uuid).delete()
         except ObjectDoesNotExist:
-            return 404
+            raise NotFound()
     return 200
 
 
@@ -139,16 +142,37 @@ def get_friends(request):
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def user_profile(request, uuid=None):
-    if not uuid:
-        user = request.user
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=200)
-    else:
-        try:
-            uuid = utils.decode(uuid)
-            serializer = UserSerializer(User.objects.get(pk=uuid))
-        except (ObjectDoesNotExist, ValueError):
-            return Response(status=404)
-        return Response(serializer.data, status=200)
+    if request.method == 'GET':
+        if not uuid:
+            user = request.user
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=200)
+        else:
+            try:
+                uuid = utils.decode(uuid)
+                serializer = UserSerializer(User.objects.get(pk=uuid))
+            except (ObjectDoesNotExist, ValueError):
+                raise NotFound()
+            return Response(serializer.data, status=200)
+    elif request.method == 'POST':
+        if not uuid:
+            raise ParseError()
+        data = JSONParser().parse(request)
+        if data.get('action') == 'ADD':
+            current_user = request.user
+            try:
+                user = User.objects.get(pk=utils.decode(uuid))
+            except (ObjectDoesNotExist, ValueError):
+                raise NotFound()
+            try:
+                Friendships.objects.get(sender=current_user, receiver=user)
+                Friendships.objects.get(receiver=current_user, sender=user)
+            except ObjectDoesNotExist:
+                raise APIException(detail="A request to/from this user already exists", code=304)
+            friendship = Friendships(sender=current_user, receiver=user)
+            serializer = FriendshipSerializer(friendship)
+            friendship.save()
+            return Response(data=serializer.data, status=200)
+
