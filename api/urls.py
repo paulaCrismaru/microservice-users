@@ -6,7 +6,7 @@ app_name = 'api'
 
 user_urls = [
     url(r'users/$', views.users_list),
-    url(r'user/create/$', views.create_user),
+    url(r'user/$', views.create_user),
     url(r'user/?(?P<uuid>[0-9a-zA-Z]*)/$', views.user_profile),
 ]
 
