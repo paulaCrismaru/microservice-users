@@ -3,9 +3,12 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 # Create your models here.
 
 import uuid
+
+import utils
 
 
 class Friendships(models.Model):
@@ -24,3 +27,8 @@ class Friendships(models.Model):
             return items[item]
         except KeyError:
             raise NotImplementedError()
+
+
+Group.add_to_class('string_date', models.CharField(max_length=18, default=utils.get_now_string))
+Group.add_to_class('admins', models.ManyToManyField(User))
+Group._meta.get_field('name')._unique = False
