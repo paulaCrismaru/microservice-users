@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from api.api_urls.urls_users import user_urls
+from api.api_urls.users import user_urls
 from api.api_views import views
 
 app_name = 'api'

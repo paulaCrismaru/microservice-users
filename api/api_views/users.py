@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from api import models
 from api import utils
 from api.api_serializers import serializers
-from api.api_serializers import user_serializers
+from api.api_serializers import users as user_serializers
 
 
 @csrf_exempt

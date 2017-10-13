@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from api.api_views import views_users
+from api.api_views import users as views_users
 
 
 user_urls = [
