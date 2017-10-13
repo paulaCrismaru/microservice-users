@@ -1,38 +1,12 @@
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import NotFound, ParseError, APIException, PermissionDenied, ValidationError
 from rest_framework.parsers import JSONParser
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ParseError, APIException,PermissionDenied, ValidationError
 
-from serializers import *
-import utils
-
-
-@api_view(['GET'])
-def users_list(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
-
-
-@csrf_exempt
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def create_user(request):
-    # TODO fix when invalid data is given {'something':'irrelevant'}
-    data = JSONParser().parse(request)
-    try:
-        serializer = CreateUserSerializer()
-        serializer.create(data)
-    except ValidationError as exception:
-        return Response(exception.messages, status=400)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+from api import utils
+from api.api_serializers.serializers import *
 
 
 @csrf_exempt
@@ -141,40 +115,36 @@ def get_friends(request):
     return Response(serializer.data, status=200)
 
 
-@csrf_exempt
-@api_view(['GET', 'POST'])
-def user_profile(request, uuid=None):
-    if request.method == 'GET':
-        if not uuid:
-            user = request.user
-            serializer = UserSerializer(user)
-            return Response(serializer.data, status=200)
-        else:
-            try:
-                uuid = utils.decode(uuid)
-                serializer = UserSerializer(User.objects.get(pk=uuid))
-            except (ObjectDoesNotExist, ValueError):
-                raise NotFound()
-            return Response(serializer.data, status=200)
-    elif request.method == 'POST':
-        if not uuid:
-            raise ParseError()
-        data = JSONParser().parse(request)
-        if data.get('action') == 'ADD':
-            current_user = request.user
-            try:
-                user = User.objects.get(pk=utils.decode(uuid))
-            except (ObjectDoesNotExist, ValueError):
-                raise NotFound()
-            try:
-                Friendships.objects.get(sender=current_user, receiver=user)
-                Friendships.objects.get(receiver=current_user, sender=user)
-            except ObjectDoesNotExist:
-                raise APIException(detail="A request to/from this user already exists", code=304)
-            friendship = Friendships(sender=current_user, receiver=user)
-            serializer = FriendshipSerializer(friendship)
-            friendship.save()
-            return Response(data=serializer.data, status=200)
+# @csrf_exempt
+# @api_view(['GET', 'POST'])
+# def user_profile(request, uuid):
+#     if request.method == 'GET':
+#
+#         try:
+#             uuid = utils.decode(uuid)
+#             serializer = UserSerializer(User.objects.get(pk=uuid))
+#         except (ObjectDoesNotExist, ValueError):
+#             raise NotFound()
+#         return Response(serializer.data, status=200)
+#     elif request.method == 'POST':
+#         if not uuid:
+#             raise ParseError()
+#         data = JSONParser().parse(request)
+#         if data.get('action') == 'ADD':
+#             current_user = request.user
+#             try:
+#                 user = User.objects.get(pk=utils.decode(uuid))
+#             except (ObjectDoesNotExist, ValueError):
+#                 raise NotFound()
+#             try:
+#                 Friendships.objects.get(sender=current_user, receiver=user)
+#                 Friendships.objects.get(receiver=current_user, sender=user)
+#             except ObjectDoesNotExist:
+#                 raise APIException(detail="A request to/from this user already exists", code=304)
+#             friendship = Friendships(sender=current_user, receiver=user)
+#             serializer = FriendshipSerializer(friendship)
+#             friendship.save()
+#             return Response(data=serializer.data, status=200)
 
 
 @api_view(['GET'])
@@ -302,3 +272,6 @@ def create_group(request):
     group.admins.add(user)
     group.user_set.add(user)
     return Response(serializer.data, status=201)
+
+
+

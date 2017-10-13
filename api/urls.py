@@ -1,14 +1,10 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 
-import views
+from api.api_urls.urls_users import user_urls
+from api.api_views import views
 
 app_name = 'api'
 
-user_urls = [
-    url(r'users/$', views.users_list),
-    url(r'user/$', views.create_user),
-    url(r'user/?(?P<uuid>[0-9a-zA-Z]*)/$', views.user_profile),
-]
 
 friends_urls = [
     url(r'friends/sent_requests/?(?P<uuid>[0-9a-f\-]*)/$', views.sent_requests),
@@ -19,7 +15,7 @@ friends_urls = [
 groups_urls = [
     # url(r'groups/all/$', views.groups_all),
     url(r'groups/$', views.groups_all_in),
-    url(r'group/(?P<group_id>[0-9]{18})/$', views.action_group),
+    url(r'groups/(?P<group_id>[0-9]{18})/$', views.action_group),
     url(r'group/$', views.create_group),
 ]
 
