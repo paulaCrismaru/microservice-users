@@ -29,6 +29,12 @@ class Friendships(models.Model):
             raise NotImplementedError()
 
 
+class Membership(models.Model):
+    person = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    date_joined = models.DateField()
+
+
 Group.add_to_class('string_date', models.CharField(max_length=18, default=utils.get_now_string))
-Group.add_to_class('admins', models.ManyToManyField(User))
+Group.add_to_class('admins', models.ManyToManyField(User, through=Membership))
 Group._meta.get_field('name')._unique = False
