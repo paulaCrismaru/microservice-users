@@ -1,26 +1,7 @@
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 
-from api.models import Friendships
-
 from api import utils
-
-
-class FriendshipSerializer(serializers.ModelSerializer):
-    sender = serializers.SlugRelatedField(read_only=True, slug_field='username')
-    receiver = serializers.SlugRelatedField(read_only=True, slug_field='username')
-
-    class Meta:
-        model = Friendships
-        fields = ('sender', 'receiver', 'acceptance', 'uuid')
-
-
-class FriendSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('username',)
 
 
 class GroupSerializer(serializers.ModelSerializer):
