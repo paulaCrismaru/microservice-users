@@ -2,3 +2,5 @@
 *.cnf
 *migrations*
 *.pyc
+*.idea/*
+*config.ini
