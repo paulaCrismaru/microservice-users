@@ -1,8 +1,10 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from users import views as views_users
+from friends.urls import friends_urls
 from users.urls import user_urls
+
+from users import views as views_users
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -14,3 +16,4 @@ urlpatterns = [
 ]
 
 urlpatterns.extend(user_urls)
+urlpatterns.extend(friends_urls)

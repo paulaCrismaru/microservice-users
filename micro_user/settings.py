@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'rest_framework',
 
     'api.apps.ApiConfig',
+    'friends.apps.FriendsConfig',
     'users.apps.UsersConfig',
 )
 
