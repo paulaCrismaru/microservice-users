@@ -39,7 +39,8 @@ INSTALLED_APPS = (
 
     'rest_framework',
 
-    'api.apps.ApiConfig'
+    'api.apps.ApiConfig',
+    'users.apps.UsersConfig',
 )
 
 

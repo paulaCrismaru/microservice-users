@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -29,5 +29,5 @@ class CreateUserSerializer(serializers.ModelSerializer):
             except ObjectDoesNotExist:
                 pass
             else:
-                raise ValidationError("A user with that email already exists.")
+                raise serializers.ValidationError({"email": ["A user with that email already exists."]})
         return User.objects.create_user(**validated_data)

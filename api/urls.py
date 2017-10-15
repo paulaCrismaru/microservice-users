@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from api.api_urls.friends import friends_urls
 from api.api_views import views
-from users.users import user_urls
+
 
 app_name = 'api'
 
@@ -15,6 +15,5 @@ groups_urls = [
 ]
 
 urlpatterns = []
-urlpatterns.extend(user_urls)
 urlpatterns.extend(friends_urls)
 urlpatterns.extend(groups_urls)
