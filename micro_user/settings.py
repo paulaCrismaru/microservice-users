@@ -9,9 +9,12 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import configparser
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+conf = configparser.ConfigParser()
+conf.read(os.sep.join([BASE_DIR, 'config.ini']))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -22,10 +25,7 @@ SECRET_KEY = 'wv#6nfm_23p1y11oz*#f1%ph%de)#shx3zx(q2+to873bd*!vl'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -38,14 +38,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'rest_framework',
+
     'api.apps.ApiConfig'
 )
 
-
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,11 +65,11 @@ WSGI_APPLICATION = 'micro_user.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '<NAME>',
-        'USER': '<USER>',
-        'PASSWORD': '<PASSWORD>',
-        'HOST': '<IP>',
-        'PORT': '<PORT>'
+        'NAME': conf.get('database', 'name'),
+        'USER': conf.get('database', 'user'),
+        'PASSWORD': conf.get('database', 'password'),
+        'HOST': conf.get('database', 'host'),
+        'PORT': conf.get('database', 'port')
     }
 }
 
@@ -105,3 +101,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            # insert your TEMPLATE_DIRS here
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': [
+                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
+                # list if you haven't customized them:
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]

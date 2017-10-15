@@ -1,3 +1,4 @@
+configparser
 django
 #gunicorn
 #requests
