@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from api import utils
+from users import utils
 
 
 class UserSerializer(serializers.ModelSerializer):

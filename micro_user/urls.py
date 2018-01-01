@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
-    url(r'^', include('api.urls')),
+    url(r'^', include('groups.urls')),
     # TODO: home
     url(r'^$', views_users.CurrentUserDetails.as_view())
 ]
