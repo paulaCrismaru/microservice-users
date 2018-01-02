@@ -40,21 +40,13 @@ class GroupDetailsSerializer(serializers.ModelSerializer):
                 if membership.admin]
 
 
-class CreateMembershipSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Membership
-        fields = ('person', 'group', 'admin')
-
-
 class MembershipSerializer(serializers.ModelSerializer):
 
     member_name = serializers.SerializerMethodField()
-    membership_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
-        fields = ('person', 'member_name', 'admin', 'membership_id')
+        fields = ('person', 'member_name', 'admin', 'id')
 
     @staticmethod
     def get_member_name(obj):
@@ -62,26 +54,15 @@ class MembershipSerializer(serializers.ModelSerializer):
             return obj['person'].username
         return obj.person.username
 
-    @staticmethod
-    def get_membership_id(obj):
-        return obj.pk
 
+class MemberSerializer(MembershipSerializer):
 
-class MemberSerializer(serializers.ModelSerializer):
-
-    member_name = serializers.SerializerMethodField()
-    membership_id = serializers.SerializerMethodField()
+    person = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
-        fields = ('person', 'member_name', 'admin', 'membership_id')
+        fields = ('person', 'member_name', 'admin', 'id')
 
     @staticmethod
-    def get_member_name(obj):
-        if type(obj) is OrderedDict:
-            return obj['person'].username
-        return obj.person.username
-
-    @staticmethod
-    def get_membership_id(obj):
-        return obj.pk
+    def get_person(obj):
+        return obj.person.id
