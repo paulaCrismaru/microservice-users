@@ -40,6 +40,13 @@ class GroupDetailsSerializer(serializers.ModelSerializer):
                 if membership.admin]
 
 
+class CreateMembershipSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Membership
+        fields = ('person', 'group', 'admin', 'id')
+
+
 class MembershipSerializer(serializers.ModelSerializer):
 
     member_name = serializers.SerializerMethodField()

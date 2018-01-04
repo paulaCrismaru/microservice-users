@@ -2,20 +2,15 @@ from django.db import IntegrityError
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_condition import Or
+
 from rest_framework.response import Response
 from rest_framework import generics, status
 
 from groups.models import Membership
+from groups.permissions.permissions import IsGroupMemberPermission, IsGroupAdminPermission
 from groups.serializers import GroupDetailsSerializer, GroupSerializer, \
-    MembershipSerializer, MemberSerializer
-
-
-def is_group_admin(group_id, user_id):
-    try:
-        membership = Membership.objects.get(person__id=user_id, group__id=group_id)
-        return membership.admin
-    except ObjectDoesNotExist:
-        return True
+    MembershipSerializer, MemberSerializer, CreateMembershipSerializer
 
 
 class GroupsList(generics.ListCreateAPIView):
@@ -28,7 +23,7 @@ class GroupsList(generics.ListCreateAPIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
         group = serializer.save()
-        membership_serializer = MembershipSerializer(data={'group': group.pk, 'person': user.pk, 'admin': True})
+        membership_serializer = CreateMembershipSerializer(data={'group': group.pk, 'person': user.pk, 'admin': True})
         if not membership_serializer.is_valid():
             return Response(membership_serializer.errors, status=400)
         membership_serializer.save()
@@ -40,19 +35,13 @@ class GroupDetails(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Group.objects.all()
     serializer_class = GroupDetailsSerializer
-
-    def update(self, request, *args, **kwargs):
-        group_id = self.kwargs['pk']
-        user_id = User.objects.get(username=request.user).pk
-        if is_group_admin(group_id, user_id):
-            return super(GroupDetails, self).update(request, *args, **kwargs)
-        else:
-            return Response({"detail": "Only admins cand rename the group"}, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = (Or(IsGroupMemberPermission, IsGroupAdminPermission),)
 
 
 class GroupMembers(generics.ListCreateAPIView):
 
     serializer_class = MembershipSerializer
+    permission_classes = (Or(IsGroupMemberPermission, IsGroupAdminPermission),)
 
     def get_queryset(self):
         group_id = self.kwargs['pk']
@@ -82,6 +71,7 @@ class GroupMembersDetail(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = MemberSerializer
     lookup_url_kwarg = "membership_id"
+    permission_classes = (Or(IsGroupAdminPermission, IsGroupMemberPermission),)
 
     def get_queryset(self):
         membership_id = self.kwargs['membership_id']
@@ -90,17 +80,3 @@ class GroupMembersDetail(generics.RetrieveUpdateDestroyAPIView):
             return Membership.objects.filter(pk=membership_id, group__id=group_id)
         except ObjectDoesNotExist:
             return []
-
-    def update(self, request, *args, **kwargs):
-        group_id = self.kwargs['pk']
-        user_id = User.objects.get(username=request.user).pk
-        if is_group_admin(group_id, user_id):
-            return super(GroupMembersDetail, self).update(request, *args, **kwargs)
-        return Response({"detail": "Only admins can update information"}, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        group_id = self.kwargs['pk']
-        user_id = User.objects.get(username=request.user).pk
-        if is_group_admin(group_id, user_id):
-            return super(GroupMembersDetail, self).destroy(request, *args, **kwargs)
-        return Response({"detail": "Only admins can remove users"}, status=status.HTTP_400_BAD_REQUEST)
