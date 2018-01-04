@@ -1,14 +1,12 @@
-from django.db import IntegrityError
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.db import IntegrityError
 from rest_condition import Or
-
-from rest_framework.response import Response
 from rest_framework import generics, status
+from rest_framework.response import Response
 
 from groups.models import Membership
-from groups.permissions.permissions import IsGroupMemberPermission, IsGroupAdminPermission
+from groups.permissions import IsGroupMemberPermission, IsGroupAdminPermission
 from groups.serializers import GroupDetailsSerializer, GroupSerializer, \
     MembershipSerializer, MemberSerializer, CreateMembershipSerializer
 
