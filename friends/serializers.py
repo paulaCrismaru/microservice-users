@@ -15,18 +15,24 @@ class FriendSerializer(serializers.ModelSerializer):
         fields = ('username',)
 
 
-class FriendshipSerializer(serializers.ModelSerializer):
+class CreateFriendshipSerializer(serializers.ModelSerializer):
+
+    receiver_username = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_receiver_username(obj):
+        return obj.receiver.username
 
     class Meta:
         model = Friendship
-        fields = ('sender', 'receiver', 'acceptance', 'id')
+        fields = ('id', 'receiver', 'receiver_username', 'acceptance', )
 
     def is_valid(self, raise_exception=False):
-        if not super(FriendshipSerializer, self).is_valid(raise_exception=raise_exception):
+        if not super(CreateFriendshipSerializer, self).is_valid(raise_exception=raise_exception):
             return False
         try:
-            receiver = get_object_or_404(User, pk=self.validated_data['receiver'].pk)
-            sender = get_object_or_404(User, pk=self.validated_data['sender'].pk)
+            receiver = get_object_or_404(User, pk=self.initial_data['receiver'][0])
+            sender = get_object_or_404(User, pk=self.initial_data['sender'])
         except ValueError:
             if raise_exception:
                 raise NotFound()
